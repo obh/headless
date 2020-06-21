@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "got": "^11.3.0",
+    "node-fetch": "^2.6.0",
     "puppeteer": "^4.0.0"
   }
 }

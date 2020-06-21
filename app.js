@@ -1,5 +1,6 @@
 const express = require('express')
 const puppeteer = require('puppeteer');
+const fetch = require("node-fetch");
 const got = require('got');
 
 const IS_PRODUCTION = 'production123123' === 'production';
@@ -15,9 +16,41 @@ const getBrowser = () => IS_PRODUCTION ?
   // Run the browser locally while in development
   puppeteer.launch({
     headless: false,
-    slowMo: 250 // slow down by 250ms
+    slowMo: 1000 // slow down by 250ms
   });
 
+app.get('/otp', async(req, res) => {
+    let count = 0;
+    var client = {
+        get: async function () {
+            const response = await fetch('https://6ce17629a540.ngrok.io/otp.php')
+            const text = await response.text();
+
+            return new Promise(function (resolve, reject) {
+                count ++;
+                setTimeout(function () {
+                    if (text != "1") resolve({status:'DONE',otherStuff:'Other Stuff', otp: text});
+                    else resolve({status: `count: ${count}`});
+                }, 10000);
+            });
+        }
+    }
+
+    async function someFunction() {
+        while (true) {
+            let dataResult = await client.get('/status');
+            console.log(dataResult.status);
+            if (dataResult.status == "DONE") {
+                return dataResult;
+            }
+        }
+    }
+    (async () => {
+        let r = await someFunction();
+        console.log(r);
+        res.send(r)
+    })();
+});
 
 app.get('/image', async (req, res) => {
   let browser = null;
@@ -60,32 +93,41 @@ app.get('/image', async (req, res) => {
         timeout: 0,
         waitUntil: 'networkidle2',
     })
-    const screenshot = await page.screenshot();
     //console.log('GOT NEW RESPONSE', response.status, response.headers);
 
+    const response = await fetch('https://8c1323bd00e7.eu.ngrok.io/otp');
+    const json = await response.json();
+    const OTP = json.otp;
+    console.log("got in main");
+    console.log(OTP);
+    page.$eval('#txtOtpPassword', (el, otp) => el.value = otp, OTP);
+    page.click("button[type=submit]");
+
+    //const links = await page.evaluate(({otp}) => {
+   //     console.log(otp);
+   //     page.$eval('#txtOtpPassword', el => el.value = otp);
+   //     page.click("button[type=submit]");
+   // }, {otp});
 
     await Promise.all([
       //page.focus('#txtOtpPassword'),
       //page.type('123455'),
-      page.$eval('#txtOtpPassword', el => el.value = '123456'),
-      page.click("button[type=submit]"),
-      page.waitForNavigation({ waitUntil: 'networkidle2' }),
+      //page.$eval('#txtOtpPassword', el => el.value = otp),
+      //page.click("button[type=submit]"),
+      page.waitForNavigation({ waitUntil: 'networkidle0' }),
     ]);
 
-    await page.evaluate(async () => {
-        const response = await fetch('https://6ce17629a540.ngrok.io');
-        const text = await response.text();
-        return text;
-    });
     //await page.focus('#txtOtpPassword');
     //await page.type('123455');
     //page.click('.input[type="submit"]')
 
+    const screenshot = await page.screenshot();
     res.end(screenshot, 'binary');
-    await browser.waitForTarget(() => false);
+    //await browser.waitForTarget(() => false);
 
   } catch (error) {
       console.log(error.message);
+      console.log(error);
     if (!res.headersSent) {
       res.status(400).send(error.message);
     }
@@ -97,6 +139,18 @@ app.get('/image', async (req, res) => {
 });
 
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.get('/', async (req, res) => {
+    const response = await fetch('https://8c1323bd00e7.eu.ngrok.io/otp')
+    const json = await response.json();
+    console.log(json);
+    /*fetch('https://8c1323bd00e7.eu.ngrok.io/otp')
+        .then(res => res.json())
+        .then(function(data) {
+            returned = data;
+            console.log(returned);  //expecting array
+            //res.render('./personal/index.jade', {JSON.stringify(returned)});
+        }); */
+    res.send('Hello World!')
+});
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
