@@ -1,0 +1,8 @@
+# install puppeteer
+npm i --save puppeteer
+
+#install express
+npm install express --save 
+
+#Test
+curl -X GET -o temp.png http://localhost:8080/image
