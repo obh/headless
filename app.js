@@ -103,23 +103,12 @@ app.get('/image', async (req, res) => {
     page.$eval('#txtOtpPassword', (el, otp) => el.value = otp, OTP);
     page.click("button[type=submit]");
 
-    //const links = await page.evaluate(({otp}) => {
-   //     console.log(otp);
-   //     page.$eval('#txtOtpPassword', el => el.value = otp);
-   //     page.click("button[type=submit]");
-   // }, {otp});
 
     await Promise.all([
-      //page.focus('#txtOtpPassword'),
-      //page.type('123455'),
       //page.$eval('#txtOtpPassword', el => el.value = otp),
       //page.click("button[type=submit]"),
       page.waitForNavigation({ waitUntil: 'networkidle0' }),
     ]);
-
-    //await page.focus('#txtOtpPassword');
-    //await page.type('123455');
-    //page.click('.input[type="submit"]')
 
     const screenshot = await page.screenshot();
     res.end(screenshot, 'binary');
@@ -143,13 +132,6 @@ app.get('/', async (req, res) => {
     const response = await fetch('https://8c1323bd00e7.eu.ngrok.io/otp')
     const json = await response.json();
     console.log(json);
-    /*fetch('https://8c1323bd00e7.eu.ngrok.io/otp')
-        .then(res => res.json())
-        .then(function(data) {
-            returned = data;
-            console.log(returned);  //expecting array
-            //res.render('./personal/index.jade', {JSON.stringify(returned)});
-        }); */
     res.send('Hello World!')
 });
 
