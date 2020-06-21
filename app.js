@@ -1,7 +1,6 @@
 const express = require('express')
 const puppeteer = require('puppeteer');
 const fetch = require("node-fetch");
-const got = require('got');
 
 const IS_PRODUCTION = 'production123123' === 'production';
 const app = express()

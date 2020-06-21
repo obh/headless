@@ -4,5 +4,8 @@ npm i --save puppeteer
 #install express
 npm install express --save 
 
+# fetch
+npm install node-fetch --save
+
 #Test
 curl -X GET -o temp.png http://localhost:8080/image
