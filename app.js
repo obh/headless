@@ -1,6 +1,7 @@
 const express = require('express')
 const puppeteer = require('puppeteer');
 const fetch = require("node-fetch");
+const got = require('got');
 
 const IS_PRODUCTION = 'production123123' === 'production';
 const app = express()
@@ -14,15 +15,15 @@ const getBrowser = () => IS_PRODUCTION ?
 
   // Run the browser locally while in development
   puppeteer.launch({
-    headless: false,
-    slowMo: 1000 // slow down by 250ms
+    //headless: false,
+    //slowMo: 1000 // slow down by 250ms
   });
 
 app.get('/otp', async(req, res) => {
     let count = 0;
     var client = {
         get: async function () {
-            const response = await fetch('https://6ce17629a540.ngrok.io/otp.php')
+            const response = await fetch('https://4971671609f3.ngrok.io/pg/cybersource/otp.php')
             const text = await response.text();
 
             return new Promise(function (resolve, reject) {
@@ -88,13 +89,13 @@ app.get('/image', async (req, res) => {
       */
 
     //const response = await page.goto('https://netsafe.hdfcbank.com/ACSWeb/com.enstage.entransact.servers.AccessControlServerSSL?ty=V')
-    await page.goto('https://6ce17629a540.ngrok.io/pg/cybersource/pay.php', {
+    await page.goto('https://4971671609f3.ngrok.io/pg/cybersource/pay.php', {
         timeout: 0,
         waitUntil: 'networkidle2',
     })
     //console.log('GOT NEW RESPONSE', response.status, response.headers);
 
-    const response = await fetch('https://8c1323bd00e7.eu.ngrok.io/otp');
+    const response = await fetch('https://0dcaa716e685.eu.ngrok.io/otp');
     const json = await response.json();
     const OTP = json.otp;
     console.log("got in main");
@@ -128,7 +129,7 @@ app.get('/image', async (req, res) => {
 
 
 app.get('/', async (req, res) => {
-    const response = await fetch('https://8c1323bd00e7.eu.ngrok.io/otp')
+    const response = await fetch('https://0dcaa716e685.eu.ngrok.io/otp')
     const json = await response.json();
     console.log(json);
     res.send('Hello World!')
