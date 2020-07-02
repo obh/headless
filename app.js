@@ -21,9 +21,10 @@ const getBrowser = () => IS_PRODUCTION ?
 
 app.get('/otp', async(req, res) => {
     let count = 0;
+    var pollURL = req.query.pollURL
     var client = {
         get: async function () {
-            const response = await fetch('https://4971671609f3.ngrok.io/pg/cybersource/otp.php')
+            const response = await fetch(pollURL)
             const text = await response.text();
 
             return new Promise(function (resolve, reject) {
@@ -40,7 +41,7 @@ app.get('/otp', async(req, res) => {
         while (true) {
             let dataResult = await client.get('/status');
             console.log(dataResult.status);
-            if (dataResult.status == "DONE") {
+            if (dataResult.status == "DONE" || count > 10) {
                 return dataResult;
             }
         }
@@ -52,9 +53,11 @@ app.get('/otp', async(req, res) => {
     })();
 });
 
-app.get('/image', async (req, res) => {
+app.get('/pay-headless', async (req, res) => {
   let browser = null;
   console.log("trying image");
+  var payURL = req.query.payURL;
+  var otpURL = req.query.pollURL;
   try {
     browser = await getBrowser();
     const page = await browser.newPage();
@@ -75,27 +78,46 @@ app.get('/image', async (req, res) => {
     });
 */
 
-        /*
-    page.once("request", interceptedRequest => {
-        interceptedRequest.continue({
-          method: "POST",
-          postData: "PaReq=eNpVUstuwjAQvPsrEB+AHyGhoMUSBBCoApW0Unt1jdUEgQHHqYCv7zqQ0vq0s16PZ8aGt9wZM3k1unJGwtKUpfoyrWIzbKfcf5wqF+ntxrG1SFfXLm9LeBll5iTh27iyOFjJO6wjgDaQIIXTubJegtKn8WIluxFnfRy5QwJ74xYTyQVrVoQL6K1NwKq9kWOnrM5bC+uNs8ojtdoBrbcI6ENlvbvIKE6ANoBA5XYy9/5YDij9rM939IECDX0C9CHspQpViX7PxUaurzP2Pp9xvV1t1T67LGfTy5rFyWoyHQINEwQ2yhspGEpOBG9xNoijAUPNdZ+A2gcRMisxjRid3iCBY7hodEM87PxtoI/KOWN1Y6RBBMz5eLAGZzC23xotPISn85Cv9phY3z0nLuXHpcizLo/7ohclvaeI9ZKQeT1SMxYYkhBB9R0gYaCh9xel98fH6t+n+AHUDK7t&MD=QzF0WHF1cjNjamRyMFEyQ056NDE=&TermUrl=https://6ce17629a540.ngrok.io/pg/cybersource/terminal.php",
-          headers: {
-            ...interceptedRequest.headers(),
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        });
-      });
-      */
-
-    //const response = await page.goto('https://netsafe.hdfcbank.com/ACSWeb/com.enstage.entransact.servers.AccessControlServerSSL?ty=V')
-    await page.goto('https://4971671609f3.ngrok.io/pg/cybersource/pay.php', {
+    // Setting request interception to true
+    /*
+    await page.setRequestInterception(true);
+    page.once("request", async interceptedRequest => {
+        console.log('INTERCEPTED Request: ' + interceptedRequest.url());
+        console.log(await interceptedRequest.method());
+        try {
+            await interceptedRequest.continue({
+                method: "POST",
+                postData: "PaReq=eNpVUttuwjAMfc9XoH0AuZQyQCYS141pdFPZkOCtCmYE0RTSFra/X1LoLlEefGzrxOc48LaziOMFqtKihDnmefKBDb3p303LcqpX4UvRbq+EedaL8RO/k/A6iPEk4Yw215mRvMmaAmgNiaOwapeYQkKiTsNZJFsBZ13XcoMEUrSzseSC1Sfkvn5NEzBJinJ6yKw2SUObrU0KVLtGjvasFQKt6gRUVprCfskgbAOtAYHSHuSuKI49Si+XS3N75cEzmiJvqiwF6jsI0N85X0sf5U7+p97I2Cx5nB7W0XuXRfv1ep6G82QZTRb7SR+o7yCwcSNJwZyCe8YbrNNrdXqCAa3yBJLUjyPj3JkTOuFXSODoHxpcEfeVvwmnqLQWjaol1YgAfh4z4wRI59JP7CT8Dj569HarwhkoLsNwO2J5LPRDi4fdwN2AMd5p+xVULRWjdnYJwYKKUlfeUU9Dbwumt7/gon9/5BsuDLU9&MD=RnV1RmlZNU90NjZZMm5MaVNESjE=&TermUrl=https://6ce17629a540.ngrok.io/pg/cybersource/terminal.php",
+                headers: {
+                  ...interceptedRequest.headers(),
+                  "Content-Type": "application/x-www-form-urlencoded"
+                  }
+                });
+        } catch(err) {
+            console.log(err);
+        }
+    });
+    await page.goto('https://netsafe.hdfcbank.com/ACSWeb/com.enstage.entransact.servers.AccessControlServerSSL?ty=V', {
         timeout: 0,
         waitUntil: 'networkidle2',
     })
-    //console.log('GOT NEW RESPONSE', response.status, response.headers);
+    page.on('response', async response => {
+        console.log('INTERCEPTED Response: ' + response.url());
+        console.log(await response.status());
 
-    const response = await fetch('https://0dcaa716e685.eu.ngrok.io/otp');
+    });
+    */
+
+    console.log("payment URL is -> " + payURL);
+    // The below works for a GET request
+    await page.goto(payURL, {
+        timeout: 0,
+        waitUntil: 'networkidle2',
+    })
+
+    var pollURL = "http://localhost:8080/otp?pollURL=" + otpURL
+    console.log("trying to poll OTP from " + pollURL)
+    const response = await fetch(pollURL);
     const json = await response.json();
     const OTP = json.otp;
     console.log("got in main");
@@ -105,8 +127,6 @@ app.get('/image', async (req, res) => {
 
 
     await Promise.all([
-      //page.$eval('#txtOtpPassword', el => el.value = otp),
-      //page.click("button[type=submit]"),
       page.waitForNavigation({ waitUntil: 'networkidle0' }),
     ]);
 
@@ -127,6 +147,10 @@ app.get('/image', async (req, res) => {
   }
 });
 
+app.get('/test', (req, res) => {
+    var url = req.query.url
+    res.send(url)
+});
 
 app.get('/', async (req, res) => {
     const response = await fetch('https://0dcaa716e685.eu.ngrok.io/otp')
