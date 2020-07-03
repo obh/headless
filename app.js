@@ -6,7 +6,7 @@ const got = require('got');
 const IS_PRODUCTION = 'production123123' === 'production';
 const app = express()
 
-const port = 8080
+const port = 8081
 
 
 const getBrowser = () => IS_PRODUCTION ?
@@ -115,7 +115,7 @@ app.get('/pay-headless', async (req, res) => {
         waitUntil: 'networkidle2',
     })
 
-    var pollURL = "http://localhost:8080/otp?pollURL=" + otpURL
+    var pollURL = "http://localhost:8081/otp?pollURL=" + otpURL
     console.log("trying to poll OTP from " + pollURL)
     const response = await fetch(pollURL);
     const json = await response.json();
