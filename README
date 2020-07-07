@@ -9,3 +9,5 @@ npm install node-fetch --save
 
 #Test
 curl -X GET -o temp.png http://localhost:8080/image
+
+curl -X GET -H 'Content-Type: application/json' 'http://localhost:8081/pay-headless?payURL=https://www.cashfree.com&pollURL=https://5f140c9d4036.eu.ngrok.io/pg/cybersource/otp.php?txnId=1593691899&type=get'
