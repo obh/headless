@@ -82,27 +82,23 @@ app.get('/pay-headless', async (req, res) => {
            return new Promise(function (resolve, reject) {
                count ++;
                setTimeout(function () {
-                   if (text != "1") resolve({status:'DONE',otherStuff:'Other Stuff', otp: text});
-                   else resolve({status: `count: ${count}`});
-               }, 10000);
+                   if (text != "1") resolve({status:'DONE', otp: text});
+                   else resolve({status: `fetch count: ${count}`});
+               }, 1000);
            });
        }
     }
-     async function someFunction() {
+     async function fetchOTP() {
          while (true) {
              let dataResult = await client.get('/status');
+             console.log("Fetching data...")
              console.log(dataResult.status);
              if (dataResult.status == "DONE" || count > 10) {
                  return dataResult;
              }
          }
      }
-     (async () => {
-         //let r = await someFunction();
-         //console.log(r);
-         // send otp back
-     })();
-    let r = await someFunction();
+    let r = await fetchOTP();
     console.log(r);
 
     //var pollURL = "http://localhost:8081/otp?pollURL=" + otpURL
