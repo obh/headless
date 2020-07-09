@@ -126,9 +126,11 @@ var Const = require('./svcConstants');
              output.Status = Const.RESPONSE_STATUS_OK;
              output.Message = Const.RESPONSE_INITIATE_OK;
              bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme]
-             setTimeout(function() {
-                 this.closePage(id);
-             }, bankCfg.timeout);
+             // close the browser after some time
+             var that = this;
+             setTimeout(function () {
+                 that.closePage(id);
+             }, bankCfg.timeout * 1000);
              console.log("page creation finished successfully");
          } catch(e){
              console.log(e);

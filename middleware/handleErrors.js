@@ -1,16 +1,17 @@
 const { GeneralError } = require('../utils/errors');
+const Const = require('../svcConstants');
 
 const handleErrors = (err, req, res, next) => {
   if (err instanceof GeneralError) {
     return res.status(err.getCode()).json({
-      status: 'error',
-      message: err.message
+      Status: Const.RESPONSE_STATUS_ERROR,
+      Message: err.message
     });
   }
 
   return res.status(500).json({
-    status: 'error',
-    message: err.message
+    Status: Const.RESPONSE_STATUS_ERROR,
+    Message: err.message
   });
 }
 

@@ -26,9 +26,10 @@ router.post('/initiate', jsonParser, async function (req, res, next) {
         "resendOtpAttempts" : 0
     }
     try {
-    let respStatus = await counter.createNewPage(txnId, metadata, reqDetails, attemptDetails);
+        let respStatus = await counter.createNewPage(txnId, metadata, reqDetails, attemptDetails);
         res.json(respStatus);
     } catch(e) {
+        console.log(e);
         next(e);
     }
 });
@@ -40,6 +41,7 @@ router.post('/otp', jsonParser, async function (req, res, next) {
         let respStatus = await counter.submitOTP(txnId, otp);
         res.json(respStatus);
     } catch(e) {
+        console.log(e);
         next(e);
     }
 });
@@ -48,8 +50,9 @@ router.post('/resendOtp', jsonParser, async function (req, res, next) {
     try {
         const txnId = req.body.id;
         let respStatus = await counter.resendOTP(txnId);
-        res.json(out);
+        res.json(respStatus);
     } catch(e) {
+        console.log(e);
         next(e);
     }
 });
