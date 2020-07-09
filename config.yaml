@@ -1,0 +1,6 @@
+hdfc:
+  otpSelector: "#txtOtpPassword"
+  submitSelector: "button[type=submit]"
+  failurePage: "ACSWeb/authJsp/authImprovedHopsTxnPage.jsp?transType=adsReg"
+  successPage: "terminal.php"
+  
