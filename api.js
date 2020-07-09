@@ -15,7 +15,8 @@ router.post('/initiate', jsonParser, async function (req, res, next) {
     var txnId = req.body.id;
     var metadata = {
         "bankName" : req.body.bankName,
-        "cardType" : req.body.cardType
+        "cardType" : req.body.cardType,
+        "cardScheme" : req.body.cardScheme
     }
     var reqDetails = {
         "payUrl" :  req.body.payUrl,

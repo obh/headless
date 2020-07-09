@@ -14,6 +14,7 @@ const yaml = require('js-yaml')
          let fileContents = fs.readFileSync('./config.yaml', 'utf8');
          var bankConfig = yaml.safeLoad(fileContents);
          console.log(bankConfig);
+         console.log(bankConfig["hdfc"]["credit"]["visa"]);
      } catch (e) {
          console.log(e);
      }
@@ -39,7 +40,7 @@ const yaml = require('js-yaml')
             }
             metadata = pagesMetadata[id]
             page = pages[id].page
-            bankCfg = bankConfig[metadata.bankName];
+            bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
             console.log("Using config for bank ", bankCfg);
 
             page.$eval(bankCfg["otpSelector"], (el, otp) => el.value = otp, OTP);
@@ -111,6 +112,9 @@ const yaml = require('js-yaml')
         const response = await page.goto(url, {
             waitUntil: 'networkidle0',
         });
+        metadata = pagesMetadata[id];
+        bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
+        await page.waitForSelector(bankCfg["otpSelector"], { visible: true, timeout: 0 });
         return 1
      }
 
