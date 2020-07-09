@@ -2,7 +2,11 @@ hdfc:
   credit:
     visa:
       otpSelector: "#txtOtpPassword"
+      resendOtpSelector: "#otpBtnReGen"
       submitSelector: "button[type=submit]"
       failurePage: "ACSWeb/authJsp/authImprovedHopsTxnPage.jsp?transType=adsReg"
       successPage: "terminal.php"
+      timeout: 180000
+      otpAttempts: 3
+      resendOtpAttempts: 2
   

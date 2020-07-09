@@ -1,8 +1,9 @@
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json()
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json()
+const handleErrors = require('./middleware/handleErrors');
 var morgan = require('morgan');
 
 app.use(morgan('dev'));
@@ -18,6 +19,8 @@ app.get('/value', function (req, res, next) {
 });
 
 app.use('/api', require('./api.js'));
+
+app.use(handleErrors);
 
 var server = app.listen(3000, function () {
     var host = server.address().address;

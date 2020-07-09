@@ -5,10 +5,8 @@ var counter = require('./acsPages.js');
 var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
 
-
-function validateInitiateReq(req) {
-    // mandatory parameters
-}
+const handleErrors = require('./middleware/handleErrors');
+const { BadRequest } = require('./utils/errors');
 
 router.post('/initiate', jsonParser, async function (req, res, next) {
     console.log(req.body);
@@ -23,27 +21,44 @@ router.post('/initiate', jsonParser, async function (req, res, next) {
         "payParams" : req.body.reqParams,
         "reqType" : req.body.reqType
     }
-
-    counter.addCount();
-    await counter.createNewPage(txnId, metadata, reqDetails);
-
-    res.send(req.body.id  + ' API Called successful. Pages: ' + counter.getCount());
+    var attemptDetails = {
+        "otpAttempts" : 0,
+        "resendOtpAttempts" : 0
+    }
+    try {
+    let respStatus = await counter.createNewPage(txnId, metadata, reqDetails, attemptDetails);
+        res.json(respStatus);
+    } catch(e) {
+        next(e);
+    }
 });
 
 router.post('/otp', jsonParser, async function (req, res, next) {
-    var txnId = req.body.id;
-    var otp = req.body.otp;
-
-    resp = await counter.submitOTP(txnId, otp);
-    res.send(resp);
+    try {
+        const txnId = req.body.id;
+        const otp = req.body.otp;
+        let respStatus = await counter.submitOTP(txnId, otp);
+        res.json(respStatus);
+    } catch(e) {
+        next(e);
+    }
 });
 
-router.get('/test', function (req, res, next) {
+router.post('/resendOtp', jsonParser, async function (req, res, next) {
+    try {
+        const txnId = req.body.id;
+        let respStatus = await counter.resendOTP(txnId);
+        res.json(out);
+    } catch(e) {
+        next(e);
+    }
+});
+
+router.get('/test', async(req, res, next) => {
     counter.addCount();
-    counter.test();
-    res.send("OK");
-    //var title = counter.getPageTitle(req.params.id).then(function(d){
-    //    res.send(d);
-    //});
+    counter.test().then( (out) => {
+        throw new BadRequest('something is missing');
+        //res.send(out)
+    }).catch( e => next(e));
 });
 module.exports = router;
