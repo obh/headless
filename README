@@ -6,8 +6,34 @@ npm install express --save
 
 # fetch
 npm install node-fetch --save
+npm install qs
+npm install js-yaml
 
 #Test
-curl -X GET -o temp.png http://localhost:8080/image
+ curl --request POST \
+   --url http://localhost:3000/api/initiate \
+   --header 'content-type: application/json' \
+   --data '{
+     "id":"123",
+     "bankName" : "hdfc",
+     "cardType" : "credit",
+     "cardScheme" : "visa",
+     "payUrl" : "https://test.cashfree.com/headless/pay.php?txnId=1594331651&card=VISA",
+     "reqType" : "get",
+     "reqParams" : {}
+ }'
 
-curl -X GET -H 'Content-Type: application/json' 'http://localhost:8081/pay-headless?payURL=https://www.cashfree.com&pollURL=https://5f140c9d4036.eu.ngrok.io/pg/cybersource/otp.php?txnId=1593691899&type=get'
+ curl --request POST \
+   --url http://localhost:3000/api/resendOtp \
+   --header 'content-type: application/json' \
+   --data '{
+     "id" : "123"
+ }'
+
+ curl --request POST \
+   --url http://localhost:3000/api/otp \
+   --header 'content-type: application/json' \
+   --data '{
+     "id":"123",
+     "otp" : "733136"
+ }'
