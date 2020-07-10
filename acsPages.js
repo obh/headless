@@ -159,6 +159,7 @@ var Const = require('./svcConstants');
              return -1
          }
          page = pages[id].page
+         await page.setRequestInterception(true);
          page.on('request', interceptedRequest => {
              var data = {
                  'method' : 'POST',
@@ -170,7 +171,12 @@ var Const = require('./svcConstants');
              };
              interceptedRequest.continue(data);
          });
-         const response = await page.goto(url);
+         const response = await page.goto(url, {
+            waitUntil: 'networkidle0',
+         });
+         metadata = pagesMetadata[id];
+         bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
+         await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 0 });
          return 0;
      }
 
