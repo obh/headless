@@ -37,3 +37,20 @@ npm install js-yaml
      "id":"123",
      "otp" : "733136"
  }'
+
+# TODO
+1. Input validation (easy)
+2. Error handling 
+    2.1 Timeouts for each API call (what if bank page does not load)
+    2.2 Error response if service cannot handle a new page
+    2.3 Error response if service goes down, what should the caller do
+
+3. Metrics
+    3.1 Current metrics for the servie - cpu, memory, etc.
+    3.2 Current metrics for pages etc. 
+
+4. Logic improvement
+    4.1 Resend otp should increase timeout
+    4.2 Otp attempts and other details are in-memory (so if service crashes) all ongoing payments will fail
+
+5. Easy way for caller service to know if the service is up 

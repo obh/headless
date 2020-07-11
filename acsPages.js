@@ -110,9 +110,11 @@ var Const = require('./svcConstants');
          console.log("creating new page...");
          try {
              pages[id]= {};
-             pages[id].browser = await puppeteer.launch({
-                 headless: false
-             });
+             //pages[id].browser = await puppeteer.launch({
+             //    headless: false
+             //});
+             // Using docker image from browserless
+             pages[id].browser = await puppeteer.connect({ browserWSEndpoint: 'ws://localhost:3000' });
              pages[id].page = await pages[id].browser.newPage();
              pagesMetadata[id] = metadata
              pageParams[id] = reqDetails
