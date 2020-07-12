@@ -11,6 +11,7 @@ module.exports = {
     RESPONSE_MSG_OTP_EXCEEDED   : "OTP attempts Exceeded",
     RESPONSE_MSG_RETRY_EXCEEDED : "OTP Retries Exceeded",
     RESPONSE_MSG_OTP_FAIL       : "Incorrect OTP Entered",
+    RESPONSE_MSG_TIMEOUT        : "Request to page or element timed out",
     RESPONSE_MSG_OTP_OK         : "OTP correct",
     RESPONSE_INITIATE_OK        : "Page created successfully",
 }

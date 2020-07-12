@@ -9,4 +9,14 @@ hdfc:
       timeout: 180
       otpAttempts: 3
       resendOtpAttempts: 2
-  
+
+citibank:
+  debit:
+    mastercard:
+      otpSelector: "#otpcode"
+      submitSelector: "#next"
+      failurePage: "https://www.citibank.co.in/AcsAuthenticationService/authentication/validate?action=submit"
+      successPage: "terminal.php"
+      timeout: 180
+      otpAttempts: 3
+      resendOtpAttempts: 1

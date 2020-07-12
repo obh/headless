@@ -10,16 +10,18 @@ var Const = require('./svcConstants');
      const pagesMetadata = {};
      const pageParams = {};
      const attemptDetails = {};
+     var bankConfig;
 
      try {
          let fileContents = fs.readFileSync('./config.yaml', 'utf8');
-         var bankConfig = yaml.safeLoad(fileContents);
+         bankConfig = yaml.safeLoad(fileContents);
          console.log(Const);
          console.log(bankConfig);
          console.log(bankConfig["hdfc"]["credit"]["visa"]);
      } catch (e) {
          console.log(e);
      }
+
      this.addCount = function () {
          count++
      }
@@ -59,7 +61,7 @@ var Const = require('./svcConstants');
 
             var respStatus = "Error";
             await page.on('response', response => {
-                if(response.status && response.url().endsWith(bankCfg.failurePage)) {
+                if(response.status && response.url().includes(bankCfg.failurePage)) {
                     output.Status = Const.RESPONSE_STATUS_OK;
                     output.Message = Const.RESPONSE_MSG_OTP_FAIL;
                     console.log("Found the error");
@@ -87,19 +89,22 @@ var Const = require('./svcConstants');
         if( !this.txnExists(id) ) {
             return output;
         }
-
-        metadata = pagesMetadata[id]
-        bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
-        resendOtpAttempts = bankCfg.resendOtpAttempts
-        currAttempts = attemptDetails[id].resendOtpAttempts
-        if( currAttempts >= resendOtpAttempts) {
-            return -1;
+        try {
+            metadata = pagesMetadata[id]
+            bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
+            resendOtpAttempts = bankCfg.resendOtpAttempts
+            currAttempts = attemptDetails[id].resendOtpAttempts
+            if( currAttempts >= resendOtpAttempts) {
+                return -1;
+            }
+            attemptDetails[id].resendOtpAttempts += 1
+            page = pages[id].page
+            page.click(bankCfg.resendOtpSelector);
+            resp = await page.waitForNavigation();
+        } catch(e) {
+            console.log(e);
         }
-        attemptDetails[id].resendOtpAttempts += 1
-        page = pages[id].page
-        page.click(bankCfg.resendOtpSelector);
-        resp = await page.waitForNavigation();
-        return 1;
+        return output
     }
 
      this.createNewPage = async function(id, metadata, reqDetails){
@@ -110,11 +115,11 @@ var Const = require('./svcConstants');
          console.log("creating new page...");
          try {
              pages[id]= {};
-             //pages[id].browser = await puppeteer.launch({
-             //    headless: false
-             //});
+             pages[id].browser = await puppeteer.launch({
+                 headless: false
+             });
              // Using docker image from browserless
-             pages[id].browser = await puppeteer.connect({ browserWSEndpoint: 'ws://localhost:3000' });
+             //pages[id].browser = await puppeteer.connect({ browserWSEndpoint: 'ws://localhost:3000' });
              pages[id].page = await pages[id].browser.newPage();
              pagesMetadata[id] = metadata
              pageParams[id] = reqDetails
@@ -135,6 +140,7 @@ var Const = require('./svcConstants');
              }, bankCfg.timeout * 1000);
              console.log("page creation finished successfully");
          } catch(e){
+             output.Message = this.errorHandling(e);
              console.log(e);
          }
          return output;
@@ -146,11 +152,13 @@ var Const = require('./svcConstants');
          // page.goto waits till load event
          const response = await page.goto(url, {
              waitUntil: 'networkidle0',
+             timeout: 10000,
          });
+         console.log(response);
          metadata = pagesMetadata[id];
          bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
          //TODO We should track all the redirection times
-         await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 0 });
+         await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 30000 });
          console.log(page.title());
      }
 
@@ -173,12 +181,16 @@ var Const = require('./svcConstants');
              };
              interceptedRequest.continue(data);
          });
+         // this is navigation timeout for the loading page. But since we could have redirects involved
          const response = await page.goto(url, {
             waitUntil: 'networkidle0',
+            timeout: 10000,
          });
+         console.log(response);
          metadata = pagesMetadata[id];
          bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
-         await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 0 });
+         // TODO Timeout should come from config
+         await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 30000 });
          return 0;
      }
 
@@ -204,6 +216,12 @@ var Const = require('./svcConstants');
         console.log((id in pageParams));
         console.log((id in attemptDetails));
         return ((id in pages) && (id in pagesMetadata) && (id in pageParams) && (id in attemptDetails))
+     }
+
+     this.errorHandling = (e) => {
+        if(e instanceof puppeteer.errors.TimeoutError) {
+            return Const.RESPONSE_MSG_TIMEOUT;
+        }
      }
  }
 
