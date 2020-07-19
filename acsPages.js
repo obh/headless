@@ -39,6 +39,16 @@ var Const = require('./svcConstants');
         //throw new Error("broken");
      }
 
+     this.getPage = async function(id) {
+        var output = {"Status": Const.RESPONSE_STATUS_ERROR, "Message": Const.RESPONSE_MSG_INVALID_ID};
+        if( !this.txnExists(id) ) {
+            return output;
+        }
+        page = pages[id].page
+        console.log("FOUND PAGE: " + page.url())
+        return {"Status": Const.RESPONSE_STATUS_OK, "Message" : Const.RESPONSE_MSG_OTP_OK};
+     }
+
      this.submitOTP = async function(id, OTP) {
         var output = {"Status": Const.RESPONSE_STATUS_ERROR, "Message": Const.RESPONSE_MSG_INVALID_ID};
         if( !this.txnExists(id) ) {
@@ -115,29 +125,30 @@ var Const = require('./svcConstants');
          console.log("creating new page...");
          try {
              pages[id]= {};
-             pages[id].browser = await puppeteer.launch({
-                 headless: false
-             });
+             //pages[id].browser = await puppeteer.launch({
+             //    headless: false
+             //});
              // Using docker image from browserless
-             //pages[id].browser = await puppeteer.connect({ browserWSEndpoint: 'ws://localhost:3000' });
+             pages[id].browser = await puppeteer.connect({ browserWSEndpoint: 'ws://localhost:4545' });
              pages[id].page = await pages[id].browser.newPage();
              pagesMetadata[id] = metadata
              pageParams[id] = reqDetails
              attemptDetails[id] = reqDetails
 
              if (reqDetails.reqType == "get") {
-                await this.getUrl(id, reqDetails.payUrl)
+                 //await this.getUrl(id, reqDetails.payUrl)
+                await this.getUrl(id, "https://www.cashfree.com")
              } else if(reqDetails.reqType == "post") {
                 await this.postUrl(id, reqDetails.payUrl, "application/x-www-form-urlencoded", reqDetails.payParams)
              }
              output.Status = Const.RESPONSE_STATUS_OK;
              output.Message = Const.RESPONSE_INITIATE_OK;
-             bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme]
+        //     bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme]
              // close the browser after some time
              var that = this;
-             setTimeout(function () {
-                 that.closePage(id);
-             }, bankCfg.timeout * 1000);
+          //   setTimeout(function () {
+          //       that.closePage(id);
+          //   }, bankCfg.timeout * 1000);
              console.log("page creation finished successfully");
          } catch(e){
              output.Message = this.errorHandling(e);
@@ -152,13 +163,13 @@ var Const = require('./svcConstants');
          // page.goto waits till load event
          const response = await page.goto(url, {
              waitUntil: 'networkidle0',
-             timeout: 10000,
+             timeout: 40000,
          });
          console.log(response);
          metadata = pagesMetadata[id];
          bankCfg = bankConfig[metadata.bankName][metadata.cardType][metadata.cardScheme];
          //TODO We should track all the redirection times
-         await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 30000 });
+         //await page.waitForSelector(bankCfg.otpSelector, { visible: true, timeout: 30000 });
          console.log(page.title());
      }
 

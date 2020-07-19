@@ -40,9 +40,9 @@ app.post('/posttest', async(req, res) => {
         // Here, is where you change the request method and
         // add your post data
         var formdata = {
-            'PaReq' : "eNpVUttuwjAMfc9XVPuA5tJ1A2QiwVg1tKu6aeW1Cwa6rSmkKXR/v6TQXfLkY1snPseGl41BnD2jagxKuMe6ztcYFMvxWbKz9y0r1eS6zIYfdtbctvxMwtMkxZ2EPZq6qLTkIQsF0B4SR2HUJtdWQq520/mDPI84G7qWEyRQopnPJBesfzH39WOagM5LlMlnZQqdB4Vemdyi2gQ1mn2hEGhXJ6CqRlvzJaP4AmgPCDTmU26s3Y4oPRwO4erIg3vUtg5VVQL1HQTo75xPjY9qJ78tljLVCXtZrA9v2cM0zfjiMbMsvXm9w9n1GKjvILB0I0nBnIJLNgj4cBRfjngMtMsTyEs/jkxrZ47LniCBrf9ockTcV/4mnKLGGNSql9QjAthuK+0ESOfST+wk/A5+dePtVtYZGK+eozq5+JpH78mAx8NzEQ1EFAsR+RV0LR1j4ewSETtSFp131NPQ04Lp6RZc9O9GvgFwQLXl",
-            'MD' : 'RnF0TXgwbWNBRW1XOWt0RHVLeDE=',
-            'TermUrl' : 'https://e6c3857ed56a.ngrok.io/pg/cybersource/terminal.php?txnId=1594215659',
+            'PaReq' : "eNpVUstuwjAQvPsrUD8AxzFJAG0tAX0QtTxEe+otdZbiijjUeVG+vnYgpfVpZ3c1nhkbXncG8e4FZWVQwAKLIvnAnkpvbwpvtcreTptBY4Jh8+zzxyd2I2A92eCXgBpNoXItWN/r+0A7SCyFkbtElwIS+TWNl2LAmTeyKxdIIEMT3wnme90JmJuf2wR0kqF42OdG6aSn9NYkJcpdr0BTK4lA2zkBmVe6NN+CByHQDhCozF7syvIwprRpmv72zIM16rLoyzwD6jYI0KvOdeWqwto/qlTI03T96rME97GX8pit5uli8bmcv5zub4G6DQKplSR8zzqIGO+xaMyDMbcy2j6BJHNyxKaw4QTW+BkSOLiLJmfE3ORvwzqqjEEtO0sdIoDHQ66tAWFT+q2thavw2dzFLUsb4FBNo3oSvceRmQ1ZMBqEIYt4OIhG7gnalZZR2bh83+MtpWqzo46GXh6YXv6Crf79kR/JnbT/",
+            'MD' : 'czBPT21aelI0d3I1OHdMMjNHSzE=',
+            'TermUrl' : 'https://test.cashfree.com/headless/terminal.php?txnId=1594661728&card=VISA',
         }
         var data = {
             'method': 'POST',

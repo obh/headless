@@ -17,5 +17,8 @@
     "node-fetch": "^2.6.0",
     "puppeteer": "^4.0.0",
     "qs": "^6.9.4"
+  },
+  "devDependencies": {
+    "zombie": "^6.1.4"
   }
 }
